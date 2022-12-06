@@ -1,3 +1,6 @@
+# Final project for 6.8610
+This is a modified version of the OpenTag model and its read me can be found below. 
+
 # OpenTag_2019
 [Scaling Up Open Tagging from Tens to Thousands: Comprehension Empowered Attribute Value Extraction from Product Title](https://www.aclweb.org/anthology/P19-1514)
 > 该论文是在[OpenTag: Open Attribute Value Extraction from Product Profiles](https://arxiv.org/pdf/1806.01264.pdf)的基础上做的改进。模型结构如下：
