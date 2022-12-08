@@ -4,7 +4,7 @@ DELIMITER = '<$$$>'
 
 
 def get_data_loc(data_folder, truth_folder, data_folder2, truth_folder2):
-    with open('parsed_sroire_loc_tl.txt', 'w') as output:
+    with open('parsed_sroire_loc_tl_str.txt', 'w') as output:
         num_processed = 0
         for filename in os.listdir(data_folder):
             final_string = ""
@@ -17,7 +17,7 @@ def get_data_loc(data_folder, truth_folder, data_folder2, truth_folder2):
                         text_list = line.split(',')[8:]
                         stringified = ','.join(text_list)
                         final_string += stringified[:-1] + ' ' # get rid of new line and add space
-                        final_string += line.split(',')[0] + ' ' + line.split(',')[1] + ' '
+                        final_string += str(line.split(',')[0]) + ' ' + str(line.split(',')[1]) + ' '
             final_string = final_string[:-1]
 
             truth_file = os.path.join(truth_folder, filename)
@@ -44,7 +44,7 @@ def get_data_loc(data_folder, truth_folder, data_folder2, truth_folder2):
                             text_list = line.split(',')[8:]
                             stringified = ','.join(text_list)
                             final_string += stringified[:-1] + ' '
-                            final_string += line.split(',')[0] + ' ' + line.split(',')[1] + ' '
+                            final_string += str(line.split(',')[0]) + ' ' + str(line.split(',')[1]) + ' '
             final_string = final_string[:-1]
 
 

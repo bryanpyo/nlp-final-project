@@ -37,7 +37,7 @@ def bert4token(tokenizer, title, attribute, value):
     # attribute = tokenizer.tokenize(attribute)
     # value = tokenizer.tokenize(value)
 
-    title = tokenizer.basic_tokenizer.tokenize(title)[:200]
+    title = tokenizer.basic_tokenizer.tokenize(title)
     attribute = tokenizer.basic_tokenizer.tokenize(attribute)
     value = tokenizer.basic_tokenizer.tokenize(value)
 
@@ -56,10 +56,13 @@ def bert4token(tokenizer, title, attribute, value):
                     tag[i+j] = 'B'
                 else:
                     tag[i+j] = 'I'
+    title = title[:512]
+    attribute = attribute[:512]
     title_id = tokenizer.convert_tokens_to_ids(title)
     attribute_id = tokenizer.convert_tokens_to_ids(attribute)
     value_id = tokenizer.convert_tokens_to_ids(value)
     tag_id = [TAGS[_] for _ in tag]
+
     return title_id, attribute_id, value_id, tag_id
 
 def nobert4token(tokenizer, title, attribute, value):
@@ -190,72 +193,79 @@ def rawdata2pkl4bert(path, att_list):
     with open(path, 'r', encoding='unicode_escape') as f:
         lines = f.readlines()
         for att_name in tqdm(att_list):
-            print('#'*20+att_name+'#'*20)
-            titles = []
-            attributes = []
-            values = []
-            tags = []
-            for index, line in enumerate(lines):
-                line = line.strip('\n')
-                if line:
-                    title, attribute, value = line.split('<$$$>')
-                    if attribute in [att_name] and value in title: #and _is_chinese_char(ord(value[0])):
-                        title, attribute, value, tag = bert4token(tokenizer, title, attribute, value)
-                        titles.append(title)
-                        attributes.append(attribute)
-                        values.append(value)
-                        tags.append(tag)
-            if titles:
-                print([tokenizer.convert_ids_to_tokens(i) for i in titles[:3]])
-                print([[id2tags[j] for j in i] for i in tags[:3]])
-                print([tokenizer.convert_ids_to_tokens(i) for i in attributes[:3]])
-                print([tokenizer.convert_ids_to_tokens(i) for i in values[:3]])
-                # print(asdf)
-                df = pd.DataFrame({'titles':titles,'attributes':attributes,'values':values,'tags':tags}, index=range(len(titles)))
-                print(df.shape)
-                df['x'] = df['titles'].apply(X_padding)
-                df['y'] = df['tags'].apply(X_padding)
-                df['att'] = df['attributes'].apply(tag_padding)
+            if att_name != 'address':
+                print('#'*20+att_name+'#'*20)
+                titles = []
+                attributes = []
+                values = []
+                tags = []
+                for index, line in enumerate(lines):
+                    line = line.strip('\n')
+                    if line:
+                        title, attribute, value = line.split('<$$$>')
+                        if attribute in [att_name] and value in title: #and _is_chinese_char(ord(value[0])):
+                            title, attribute, value, tag = bert4token(tokenizer, title, attribute, value)
+                            titles.append(title)
+                            attributes.append(attribute)
+                            values.append(value)
+                            tags.append(tag)
 
-                index = list(range(len(titles)))
-                random.shuffle(index)
-                train_index = index[:int(0.85*len(index))]
-                valid_index = index[int(0.85*len(index)):int(0.95*len(index))]
-                test_index = index[int(0.95*len(index)):]
+                if titles:
+                    print([tokenizer.convert_ids_to_tokens(i) for i in titles[:1]])
+                    print([[id2tags[j] for j in i] for i in tags[:3]])
+                    print([tokenizer.convert_ids_to_tokens(i) for i in attributes[:3]])
+                    print([tokenizer.convert_ids_to_tokens(i) for i in values[:3]])
 
-                train = df.loc[train_index,:]
-                valid = df.loc[valid_index,:]
-                test = df.loc[test_index,:]
-                print(f'TRAIN: {train.shape}')
-                print(f'VALID: {valid.shape}')
-                print(f'TEST: {test.shape}')
+                    # print([tokenizer.convert_ids_to_tokens(i) for i in titles[:3]])
+                    # print([[id2tags[j] for j in i] for i in tags[:3]])
+                    # print([tokenizer.convert_ids_to_tokens(i) for i in attributes[:3]])
+                    # print([tokenizer.convert_ids_to_tokens(i) for i in values[:3]])
+                    # print(asdf)
+                    df = pd.DataFrame({'titles':titles,'attributes':attributes,'values':values,'tags':tags}, index=range(len(titles)))
+                    print(df.shape)
+                    df['x'] = df['titles'].apply(X_padding)
+                    df['y'] = df['tags'].apply(X_padding)
+                    df['att'] = df['attributes'].apply(tag_padding)
 
-                train_x = np.asarray(list(train['x'].values))
-                train_att = np.asarray(list(train['att'].values))
-                train_y = np.asarray(list(train['y'].values))
+                    index = list(range(len(titles)))
+                    random.shuffle(index)
+                    train_index = index[:int(0.85*len(index))]
+                    valid_index = index[int(0.85*len(index)):int(0.95*len(index))]
+                    test_index = index[int(0.95*len(index)):]
 
-                valid_x = np.asarray(list(valid['x'].values))
-                valid_att = np.asarray(list(valid['att'].values))
-                valid_y = np.asarray(list(valid['y'].values))
+                    train = df.loc[train_index,:]
+                    valid = df.loc[valid_index,:]
+                    test = df.loc[test_index,:]
+                    print(f'TRAIN: {train.shape}')
+                    print(f'VALID: {valid.shape}')
+                    print(f'TEST: {test.shape}')
 
-                test_x = np.asarray(list(test['x'].values))
-                test_att = np.asarray(list(test['att'].values))
-                test_value = np.asarray(list(test['values'].values), dtype=object)
-                test_y = np.asarray(list(test['y'].values))
+                    train_x = np.asarray(list(train['x'].values))
+                    train_att = np.asarray(list(train['att'].values))
+                    train_y = np.asarray(list(train['y'].values))
 
-                att_name = att_name.replace('/','_')
-                with open('../data/sroire.pkl', 'wb') as outp:
-                # with open('../data/top105_att.pkl', 'wb') as outp:
-                    pickle.dump(train_x, outp)
-                    pickle.dump(train_att, outp)
-                    pickle.dump(train_y, outp)
-                    pickle.dump(valid_x, outp)
-                    pickle.dump(valid_att, outp)
-                    pickle.dump(valid_y, outp)
-                    pickle.dump(test_x, outp)
-                    pickle.dump(test_att, outp)
-                    pickle.dump(test_value, outp)
-                    pickle.dump(test_y, outp)
+                    valid_x = np.asarray(list(valid['x'].values))
+                    valid_att = np.asarray(list(valid['att'].values))
+                    valid_y = np.asarray(list(valid['y'].values))
+
+                    test_x = np.asarray(list(test['x'].values))
+                    test_att = np.asarray(list(test['att'].values))
+                    test_value = np.asarray(list(test['values'].values), dtype=object)
+                    test_y = np.asarray(list(test['y'].values))
+
+                    att_name = att_name.replace('/','_')
+                    with open('../data/blah.pkl', 'wb') as outp:
+                    # with open('../data/top105_att.pkl', 'wb') as outp:
+                        pickle.dump(train_x, outp)
+                        pickle.dump(train_att, outp)
+                        pickle.dump(train_y, outp)
+                        pickle.dump(valid_x, outp)
+                        pickle.dump(valid_att, outp)
+                        pickle.dump(valid_y, outp)
+                        pickle.dump(test_x, outp)
+                        pickle.dump(test_att, outp)
+                        pickle.dump(test_value, outp)
+                        pickle.dump(test_y, outp)
 
 def get_attributes(path):
     atts = []
@@ -271,7 +281,7 @@ def get_attributes(path):
 if __name__=='__main__':
     TAGS = {'':0,'B':1,'I':2,'O':3}
     id2tags = {v:k for k,v in TAGS.items()}
-    path = '../parsed_sroire.txt'
+    path = '../parsed_sroire_loc_tl_str.txt'
     att_list = get_attributes(path)
     print(att_list)
     rawdata2pkl4bert(path, att_list)
