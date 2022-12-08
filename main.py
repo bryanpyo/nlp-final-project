@@ -12,7 +12,10 @@ from utils import get_dataloader
 # from sklearn.metrics import precision_score, recall_score, f1_score, classification_report
 from seqeval.metrics import f1_score, accuracy_score, classification_report
 from tqdm import tqdm
+import os
 # os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+sys.stdin.reconfigure(encoding='utf-8')
+sys.stdout.reconfigure(encoding='utf-8')
 
 import logging
 logger = logging.getLogger()
@@ -82,16 +85,27 @@ def train(**kwargs):
             if ii % opt.print_freq == 0:
                 print('epoch:%04d,------------loss:%f'%(epoch,loss.item()))
 
-    model.save()
+    # print(model.state_dict())
+    # model.save(r'checkpoints\opentag2019_1207_020104.pth')
+    # torch.save(model, r'C:\Users\BryanPyo\Documents\nlp\nlp-final-project\checkpoints\opentag2019_1207_02:01:04.pth')
+
+    # path = r'C:\Users\BryanPyo\Documents\nlp\nlp-final-project\checkpoints'
+    # os.makedirs(path, exist_ok=True)
+    # torch.save(model, os.path.join(path, 'opentag2019_1207_020104.pth'))
+
+    test_path = r'C:\Users\Bryan Pyo\Documents\nlp\nlp-final-project\checkpoints\opentag2019_1207_020104.pth'
+    torch.save(model, test_path)
 
     preds, labels = [], []
-    for index, batch in enumerate(valid_dataloader):
+    for index, batch in enumerate(test_dataloader):
         model.eval()
         x = batch['x'].to(opt.device)
         y = batch['y'].to(opt.device)
         att = batch['att'].to(opt.device)
         inputs = [x, att, y]
         predict = model(inputs)
+        print('INPUTS:')
+        print(inputs)
 
         if index % 5 == 0:
             print(tokenizer.convert_ids_to_tokens([i.item() for i in x[0].cpu() if i.item()>0]))
@@ -115,6 +129,8 @@ def train(**kwargs):
         for index, i in enumerate(y.tolist()):
             labels.append([id2tags[k] if k>0 else id2tags[3] for k in i[:len(leng[index])]])
             # labels += i[:len(leng[index])]
+
+        print(labels, preds)
     # precision = precision_score(labels, preds, average='macro')
     # recall = recall_score(labels, preds, average='macro')
     # f1 = f1_score(labels, preds, average='macro')

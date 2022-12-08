@@ -172,7 +172,9 @@ class CRF(nn.Module):
 
         # Start transition score and first emission
         # shape: (batch_size,)
+        tags = tags.type(torch.LongTensor).to('cuda')
         score = self.start_transitions[tags[0]]
+
         score += emissions[0, torch.arange(batch_size), tags[0]]
 
         for i in range(1, seq_length):
