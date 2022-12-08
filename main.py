@@ -97,7 +97,7 @@ def train(**kwargs):
     torch.save(model, test_path)
 
     preds, labels = [], []
-    for index, batch in enumerate(test_dataloader):
+    for index, batch in enumerate(valid_dataloader):
         model.eval()
         x = batch['x'].to(opt.device)
         y = batch['y'].to(opt.device)

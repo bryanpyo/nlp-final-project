@@ -33,13 +33,13 @@ def _is_chinese_char(cp):
     return False
 
 def bert4token(tokenizer, title, attribute, value):
-    title = tokenizer.tokenize(title)
-    attribute = tokenizer.tokenize(attribute)
-    value = tokenizer.tokenize(value)
+    # title = tokenizer.tokenize(title)
+    # attribute = tokenizer.tokenize(attribute)
+    # value = tokenizer.tokenize(value)
 
-    # title = tokenizer.basic_tokenizer.tokenize(title)
-    # attribute = tokenizer.basic_tokenizer.tokenize(attribute)
-    # value = tokenizer.basic_tokenizer.tokenize(value)
+    title = tokenizer.basic_tokenizer.tokenize(title)
+    attribute = tokenizer.basic_tokenizer.tokenize(attribute)
+    value = tokenizer.basic_tokenizer.tokenize(value)
 
     tag = ['O']*len(title)
 
