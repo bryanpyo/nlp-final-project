@@ -93,7 +93,7 @@ def train(**kwargs):
     # os.makedirs(path, exist_ok=True)
     # torch.save(model, os.path.join(path, 'opentag2019_1207_020104.pth'))
 
-    test_path = r'C:\Users\Bryan Pyo\Documents\nlp\nlp-final-project\checkpoints\opentag2019_1207_020104.pth'
+    test_path = r'C:\Users\Samuel\Downloads\PortableGit\nlp-final-project\checkpoints\opentag2019_1207_020104.pth'
     torch.save(model, test_path)
 
     preds, labels = [], []

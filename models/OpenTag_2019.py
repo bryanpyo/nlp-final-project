@@ -11,7 +11,7 @@ class OpenTag2019(BasicModule):
 
         self.model_name = 'opentag2019'
         self.opt = opt
-        self.embedding_dim = opt.embedding_dim
+        self.embedding_dim = opt.embedding_dim + 2         # @@@@@@@@@@@@@@@@@@@@@@@@@@
         self.hidden_dim = opt.hidden_dim
         self.tagset_size = opt.tagset_size
 
@@ -54,11 +54,40 @@ class OpenTag2019(BasicModule):
         context = self.squeeze_embedding(context, context_len)
         context, _ = self.bert(context)
         # context = self.word_embeds(context)
+
+        print(f'before: {context}')
+
+        # @@@@@@@@@@@@@@@@@@@@@@@@@@
+        test_context = []
+        for row in context:
+            new = []
+            for new_row in row:
+                sample = torch.cat((new_row, torch.tensor([0,0]).to('cuda')))
+                new.append(sample)
+            new_plane = torch.stack(new, dim=0)
+            test_context.append(new_plane)
+        context = torch.stack(test_context, dim=0) 
+
+        print(f'after: {context}')
+
         context_output, _ = self.lstm(context)
 
         att = self.squeeze_embedding(att, att_len)
         att, _ = self.bert(att)
         # att = self.word_embeds(att)
+
+        # # @@@@@@@@@@@@@@@@@@@@@@@@@@
+        test_att = []
+        for row in att:
+            new = []
+            for new_row in row:
+                sample = torch.cat((new_row, torch.tensor([0,0]).to('cuda')))
+                new.append(sample)
+            new_plane = torch.stack(new, dim=0)
+            test_att.append(new_plane)
+        att = torch.stack(test_att, dim=0)
+
+
         _, att_hidden = self.lstm(att)
         att_hidden = torch.cat([att_hidden[0][-2],att_hidden[0][-1]], dim=-1)
 
@@ -85,11 +114,37 @@ class OpenTag2019(BasicModule):
         context = self.squeeze_embedding(context, context_len)
         context, _ = self.bert(context)
         # context = self.word_embeds(context)
+
+        # @@@@@@@@@@@@@@@@@@@@@@@@@@
+        test_context = []
+        for row in context:
+            new = []
+            for new_row in row:
+                sample = torch.cat((new_row, torch.tensor([0,0]).to('cuda')))
+                new.append(sample)
+            new_plane = torch.stack(new, dim=0)
+            test_context.append(new_plane)
+        context = torch.stack(test_context, dim=0)
+
+
         context_output, _ = self.lstm(context)
 
         att = self.squeeze_embedding(att, att_len)
         att, _ = self.bert(att)
         # att = self.word_embeds(att)
+
+        # @@@@@@@@@@@@@@@@@@@@@@@@@@
+        test_att = []
+        for row in att:
+            new = []
+            for new_row in row:
+                sample = torch.cat((new_row, torch.tensor([0,0]).to('cuda')))
+                new.append(sample)
+            new_plane = torch.stack(new, dim=0)
+            test_att.append(new_plane)
+        att = torch.stack(test_att, dim=0)
+
+
         _, att_hidden = self.lstm(att)
         att_hidden = torch.cat([att_hidden[0][-2],att_hidden[0][-1]], dim=-1)
 

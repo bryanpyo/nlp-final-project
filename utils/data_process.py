@@ -41,6 +41,10 @@ def bert4token(tokenizer, title, attribute, value):
     attribute = tokenizer.basic_tokenizer.tokenize(attribute)
     value = tokenizer.basic_tokenizer.tokenize(value)
 
+    print ("length of title is ", len(title))
+    print ("length of attribute is ", len(attribute))
+    print ("length of value is ", len(value))
+
     # print(type(title))
     # print(len(title))
     # print(len(attribute))
@@ -244,7 +248,7 @@ def rawdata2pkl4bert(path, att_list):
                 test_y = np.asarray(list(test['y'].values))
 
                 att_name = att_name.replace('/','_')
-                with open('../data/sroire.pkl', 'wb') as outp:
+                with open(r'C:\Users\Samuel\Downloads\PortableGit\nlp-final-project\data\sroire_loc_tl.pkl', 'wb') as outp:
                 # with open('../data/top105_att.pkl', 'wb') as outp:
                     pickle.dump(train_x, outp)
                     pickle.dump(train_att, outp)
@@ -271,7 +275,7 @@ def get_attributes(path):
 if __name__=='__main__':
     TAGS = {'':0,'B':1,'I':2,'O':3}
     id2tags = {v:k for k,v in TAGS.items()}
-    path = '../parsed_sroire.txt'
+    path = 'parsed_sroire_loc_tl.txt'
     att_list = get_attributes(path)
     print(att_list)
     rawdata2pkl4bert(path, att_list)
