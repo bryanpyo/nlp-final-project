@@ -248,7 +248,7 @@ def rawdata2pkl4bert(path, att_list):
                 test_y = np.asarray(list(test['y'].values))
 
                 att_name = att_name.replace('/','_')
-                with open(r'C:\Users\Samuel\Downloads\PortableGit\nlp-final-project\data\sroire_loc_tl.pkl', 'wb') as outp:
+                with open(r'C:\Users\Bryan Pyo\Documents\nlp\nlp-final-project\data\sroire_loc_tl.pkl', 'wb') as outp:
                 # with open('../data/top105_att.pkl', 'wb') as outp:
                     pickle.dump(train_x, outp)
                     pickle.dump(train_att, outp)

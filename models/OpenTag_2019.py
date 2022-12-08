@@ -76,6 +76,8 @@ class OpenTag2019(BasicModule):
         att, _ = self.bert(att)
         # att = self.word_embeds(att)
 
+        print(f'before att: {att}')
+
         # # @@@@@@@@@@@@@@@@@@@@@@@@@@
         test_att = []
         for row in att:
@@ -87,6 +89,7 @@ class OpenTag2019(BasicModule):
             test_att.append(new_plane)
         att = torch.stack(test_att, dim=0)
 
+        print(f'after att: {att}')
 
         _, att_hidden = self.lstm(att)
         att_hidden = torch.cat([att_hidden[0][-2],att_hidden[0][-1]], dim=-1)
