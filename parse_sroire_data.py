@@ -110,7 +110,7 @@ def get_data_no_loc(data_folder, truth_folder, data_folder2, truth_folder2):
 
 
 def main():
-    get_data_no_loc(r"C:\Users\Bryan Pyo\Documents\SROIE2019\train\box", r"C:\Users\Bryan Pyo\Documents\SROIE2019\train\entities",
+    get_data_loc(r"C:\Users\Bryan Pyo\Documents\SROIE2019\train\box", r"C:\Users\Bryan Pyo\Documents\SROIE2019\train\entities",
                     r"C:\Users\Bryan Pyo\Documents\SROIE2019\test\box", r"C:\Users\Bryan Pyo\Documents\SROIE2019\test\entities")
 
 

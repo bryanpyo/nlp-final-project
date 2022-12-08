@@ -37,9 +37,15 @@ def bert4token(tokenizer, title, attribute, value):
     # attribute = tokenizer.tokenize(attribute)
     # value = tokenizer.tokenize(value)
 
-    title = tokenizer.basic_tokenizer.tokenize(title)
+    title = tokenizer.basic_tokenizer.tokenize(title)[:200]
     attribute = tokenizer.basic_tokenizer.tokenize(attribute)
     value = tokenizer.basic_tokenizer.tokenize(value)
+
+    # print(type(title))
+    # print(len(title))
+    # print(len(attribute))
+    # print(len(value))
+    # print('----')
 
     tag = ['O']*len(title)
 
@@ -180,7 +186,7 @@ def rawdata2pkl4nobert(path):
 
 
 def rawdata2pkl4bert(path, att_list):
-    tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
+    tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased', max_lengtb=450)
     with open(path, 'r', encoding='unicode_escape') as f:
         lines = f.readlines()
         for att_name in tqdm(att_list):
@@ -219,6 +225,9 @@ def rawdata2pkl4bert(path, att_list):
                 train = df.loc[train_index,:]
                 valid = df.loc[valid_index,:]
                 test = df.loc[test_index,:]
+                print(f'TRAIN: {train.shape}')
+                print(f'VALID: {valid.shape}')
+                print(f'TEST: {test.shape}')
 
                 train_x = np.asarray(list(train['x'].values))
                 train_att = np.asarray(list(train['att'].values))
@@ -234,7 +243,7 @@ def rawdata2pkl4bert(path, att_list):
                 test_y = np.asarray(list(test['y'].values))
 
                 att_name = att_name.replace('/','_')
-                with open('../data/sroire.pkl', 'wb') as outp:
+                with open('../data/sroire_loc_tl.pkl', 'wb') as outp:
                 # with open('../data/top105_att.pkl', 'wb') as outp:
                     pickle.dump(train_x, outp)
                     pickle.dump(train_att, outp)
@@ -261,7 +270,7 @@ def get_attributes(path):
 if __name__=='__main__':
     TAGS = {'':0,'B':1,'I':2,'O':3}
     id2tags = {v:k for k,v in TAGS.items()}
-    path = '../parsed_sroire.txt'
+    path = '../parsed_sroire_loc_tl.txt'
     att_list = get_attributes(path)
     rawdata2pkl4bert(path, att_list)
     # rawdata2pkl4nobert(path)
