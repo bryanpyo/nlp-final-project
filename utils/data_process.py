@@ -8,7 +8,8 @@ import numpy as np
 import collections
 from collections import Counter
 import sys
-
+sys.stdin.reconfigure(encoding='utf-8')
+sys.stdout.reconfigure(encoding='utf-8')
 def _is_chinese_char(cp):
     """Checks whether CP is the codepoint of a CJK character."""
     # This defines a "chinese character" as anything in the CJK Unicode block:
@@ -113,7 +114,7 @@ def rawdata2pkl4nobert(path):
     attributes = []
     values = []
     tags = []
-    with open(path, 'r') as f:
+    with open(path, 'r', encoding='utf-8') as f:
         for index, line in enumerate(tqdm(f.readlines())):
             line = line.strip('\n')
             if line:
@@ -174,8 +175,8 @@ def rawdata2pkl4nobert(path):
 
 
 def rawdata2pkl4bert(path, att_list):
-    tokenizer = BertTokenizer.from_pretrained('bert-base-chinese')
-    with open(path, 'r') as f:
+    tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
+    with open(path, 'r', encoding='utf-8') as f:
         lines = f.readlines()
         for att_name in tqdm(att_list):
             print('#'*20+att_name+'#'*20)
@@ -224,11 +225,11 @@ def rawdata2pkl4bert(path, att_list):
 
                 test_x = np.asarray(list(test['x'].values))
                 test_att = np.asarray(list(test['att'].values))
-                test_value = np.asarray(list(test['values'].values))
+                test_value = np.asarray(list(test['values'].values), dtype=object)
                 test_y = np.asarray(list(test['y'].values))
 
                 att_name = att_name.replace('/','_')
-                with open('../data/all/{}.pkl'.format(att_name), 'wb') as outp:
+                with open('../data/sroire.pkl', 'wb') as outp:
                 # with open('../data/top105_att.pkl', 'wb') as outp:
                     pickle.dump(train_x, outp)
                     pickle.dump(train_att, outp)
@@ -243,7 +244,7 @@ def rawdata2pkl4bert(path, att_list):
 
 def get_attributes(path):
     atts = []
-    with open(path, 'r') as f:
+    with open(path, 'r', encoding="utf-8") as f:
         for line in f.readlines():
             line = line.strip('\n')
             if line:
@@ -255,7 +256,8 @@ def get_attributes(path):
 if __name__=='__main__':
     TAGS = {'':0,'B':1,'I':2,'O':3}
     id2tags = {v:k for k,v in TAGS.items()}
-    path = '../data/raw.txt'
+    path = '../parsed_sroire.txt'
     att_list = get_attributes(path)
-    # rawdata2pkl4bert(path, att_list)
-    rawdata2pkl4nobert(path)
+    # print(att_list)
+    rawdata2pkl4bert(path, att_list)
+    # rawdata2pkl4nobert(path)

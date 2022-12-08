@@ -30,6 +30,9 @@ def get_dataloader(opt):
     print("valid len", valid_x.shape)
 
     train_dataset = MyDataset(train_x, train_y, train_att)
+    print(train_x.shape)
+    print(train_y.shape)
+    print(train_att.shape)
     valid_dataset = MyDataset(valid_x, valid_y, valid_att)
     test_dataset = MyDataset(test_x, test_y, test_att)
 
