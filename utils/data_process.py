@@ -36,6 +36,11 @@ def bert4token(tokenizer, title, attribute, value):
     title = tokenizer.tokenize(title)
     attribute = tokenizer.tokenize(attribute)
     value = tokenizer.tokenize(value)
+
+    # title = tokenizer.basic_tokenizer.tokenize(title)
+    # attribute = tokenizer.basic_tokenizer.tokenize(attribute)
+    # value = tokenizer.basic_tokenizer.tokenize(value)
+
     tag = ['O']*len(title)
 
     for i in range(0,len(title)-len(value)):
@@ -176,7 +181,7 @@ def rawdata2pkl4nobert(path):
 
 def rawdata2pkl4bert(path, att_list):
     tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
-    with open(path, 'r', encoding='utf-8') as f:
+    with open(path, 'r', encoding='unicode_escape') as f:
         lines = f.readlines()
         for att_name in tqdm(att_list):
             print('#'*20+att_name+'#'*20)
@@ -244,7 +249,7 @@ def rawdata2pkl4bert(path, att_list):
 
 def get_attributes(path):
     atts = []
-    with open(path, 'r', encoding="utf-8") as f:
+    with open(path, 'r', encoding='unicode_escape') as f:
         for line in f.readlines():
             line = line.strip('\n')
             if line:
@@ -258,6 +263,5 @@ if __name__=='__main__':
     id2tags = {v:k for k,v in TAGS.items()}
     path = '../parsed_sroire.txt'
     att_list = get_attributes(path)
-    # print(att_list)
     rawdata2pkl4bert(path, att_list)
     # rawdata2pkl4nobert(path)
