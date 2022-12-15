@@ -180,35 +180,80 @@ def rawdata2pkl4nobert(path):
 
 
 def rawdata2pkl4bert(path, att_list):
+    print("hiiiiiii")
     tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
     with open(path, 'r', encoding='unicode_escape') as f:
         lines = f.readlines()
+        print ("length of lines is ", len(lines))
         for att_name in tqdm(att_list):
             print('#'*20+att_name+'#'*20)
             titles = []
             attributes = []
             values = []
             tags = []
+
+            counter = 0
             for index, line in enumerate(lines):
+                print ("line is", line)
                 line = line.strip('\n')
+                
                 if line:
+                    
                     title, attribute, value = line.split('<$$$>')
-                    if attribute in [att_name] and value in title: #and _is_chinese_char(ord(value[0])):
-                        title, attribute, value, tag = bert4token(tokenizer, title, attribute, value)
+                    qwertytitles = title.split('qwerty')
+                    print ("title strings are ", qwertytitles[::2])
+                    print ("title location are ", qwertytitles[1::2])
+                    print ("STRIPPED VALEU IS ", value.replace(" ", ""))
+                    print ("JOINED QWERTY IS ", "".join(qwertytitles[::2]).replace(" ", ""))
+                    if attribute in [att_name] and  value.replace(" ", "") in ("".join(qwertytitles[::2]).replace(" ", "")): #and _is_chinese_char(ord(value[0])):
+                        counter += 1
+                        
+                        title, attribute, value, tag = bert4token(tokenizer, "".join(qwertytitles[::2]), attribute, value)
+                        
+                        # title, attribute, value, tag = bert4token(tokenizer, title, attribute, value)
+                        for coordinate in qwertytitles[1::2]:
+                            x, y = coordinate.split()
+                            title.append(int(float(x)))
+                            title.append(int(float(y)))
+
+
+                        # print ('coordinate locations are ', qwertytitles[1::2])
+                        # print ("title token is", title )
+                        # print ("\n")
+                        # print ("size of title token is ", len(title))
+                        # print ("abracadabra\n")
+                        # print ("attribute token is ", attribute)
+                        # print ("\n")
+                        # print ("size of attribute token is ", len(attribute))
+                        # print ("\n")
+                        # print ("value token is ", value)
+                        # print ("\n")
+                        # print ("size of value token is ", len(value))
+                        # print ("\n")
                         titles.append(title)
                         attributes.append(attribute)
                         values.append(value)
                         tags.append(tag)
+                    else:
+                        print ("NOOOOOMATTTTTCHHHHH________________________")
+                print ("endd_________________________________________________")
+                print ("endd_________________________________________________")
+                print ("endd_________________________________________________")
+            print ("COUNTER IS ", counter)
+            print ("length of titles is ", len(titles))
             if titles:
                 print([tokenizer.convert_ids_to_tokens(i) for i in titles[:3]])
                 print([[id2tags[j] for j in i] for i in tags[:3]])
                 print([tokenizer.convert_ids_to_tokens(i) for i in attributes[:3]])
                 print([tokenizer.convert_ids_to_tokens(i) for i in values[:3]])
                 df = pd.DataFrame({'titles':titles,'attributes':attributes,'values':values,'tags':tags}, index=range(len(titles)))
-                print(df.shape)
+                print("DF SHAPE IS ", df.shape)
                 df['x'] = df['titles'].apply(X_padding)
+                print ("DF TITLES SHAPE IS ", df['titles'].shape)
                 df['y'] = df['tags'].apply(X_padding)
+                print ("DF TAGS SHAPE IS ", df['tags'].shape)
                 df['att'] = df['attributes'].apply(tag_padding)
+                print ("DF ATTRIBUTES SHAPE IS ", df['attributes'].shape)
 
                 index = list(range(len(titles)))
                 random.shuffle(index)
@@ -221,6 +266,7 @@ def rawdata2pkl4bert(path, att_list):
                 test = df.loc[test_index,:]
 
                 train_x = np.asarray(list(train['x'].values))
+                print ("size of train x is ", train_x.shape)
                 train_att = np.asarray(list(train['att'].values))
                 train_y = np.asarray(list(train['y'].values))
 
@@ -234,7 +280,7 @@ def rawdata2pkl4bert(path, att_list):
                 test_y = np.asarray(list(test['y'].values))
 
                 att_name = att_name.replace('/','_')
-                with open('../data/sroire.pkl', 'wb') as outp:
+                with open('../data/sroire_loc_tl_beta.pkl', 'wb') as outp:
                 # with open('../data/top105_att.pkl', 'wb') as outp:
                     pickle.dump(train_x, outp)
                     pickle.dump(train_att, outp)
@@ -261,7 +307,8 @@ def get_attributes(path):
 if __name__=='__main__':
     TAGS = {'':0,'B':1,'I':2,'O':3}
     id2tags = {v:k for k,v in TAGS.items()}
-    path = '../parsed_sroire.txt'
+    path = '../parsed_sroire_loc_tl_qwerty.txt'
     att_list = get_attributes(path)
+    print ("attributes are", att_list)
     rawdata2pkl4bert(path, att_list)
     # rawdata2pkl4nobert(path)
