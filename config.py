@@ -19,7 +19,7 @@ class DefaultConfig(object):
     num_workers = 4  # how many workers for loading data
     print_freq = 100  # print info every N batch
 
-    max_epoch = 10
+    max_epoch = 8
     lr = 2e-5  # initial learning rate
     lr_decay = 0.5  # when val_loss increase, lr = lr*lr_decay
     weight_decay = 0e-5  # L2正则
